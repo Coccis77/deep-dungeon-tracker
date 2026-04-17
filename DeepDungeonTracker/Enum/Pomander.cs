@@ -24,11 +24,17 @@ public enum Pomander
     Lethargy,
     Storms,
     Dread,
+    Haste,
+    Purification,
+    Devotion,
     InfernoMagicite = 60,
     CragMagicite,
     VortexMagicite,
     ElderMagicite,
     UneiDemiclone,
     DogaDemiclone,
-    OnionKnightDemiclone
+    OnionKnightDemiclone,
+    MazeRootIncense,
+    BarkBalmIncense,
+    PoisonfruitIncense,
 }

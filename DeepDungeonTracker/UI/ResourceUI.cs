@@ -23,6 +23,8 @@ public sealed class ResourceUI(IUiBuilder uiBuilder) : IDisposable
 
     public IDalamudTextureWrap Trap { get; } = Service.TextureProvider.CreateFromImageAsync(Resources.Trap).Result;
 
+    public IDalamudTextureWrap VotiveEffect { get; } = Service.TextureProvider.CreateFromImageAsync(Resources.VotiveEffect).Result;
+
     public IDalamudTextureWrap BossStatusTimer { get; } = Service.TextureProvider.CreateFromImageAsync(Resources.BossStatusTimer).Result;
 
     public IDalamudTextureWrap MapNormal { get; } = Service.TextureProvider.CreateFromImageAsync(Resources.MapNormal).Result;
@@ -46,6 +48,7 @@ public sealed class ResourceUI(IUiBuilder uiBuilder) : IDisposable
         this.Coffer.Dispose();
         this.Enchantment.Dispose();
         this.Trap.Dispose();
+        this.VotiveEffect.Dispose();
         this.BossStatusTimer.Dispose();
         this.MapNormal.Dispose();
         this.MapHallOfFallacies.Dispose();

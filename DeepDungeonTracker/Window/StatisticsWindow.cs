@@ -123,7 +123,7 @@ public sealed class StatisticsWindow : WindowEx, IDisposable
                 {
                     if (this.Data.Statistics.DeepDungeon == DeepDungeon.PalaceOfTheDead || this.Data.Statistics.DeepDungeon == DeepDungeon.HeavenOnHigh)
                         this.Data.UI.DrawMiscellaneous(x, y, value);
-                    else if (this.Data.Statistics.DeepDungeon == DeepDungeon.EurekaOrthos)
+                    else if (this.Data.Statistics.DeepDungeon == DeepDungeon.EurekaOrthos || this.Data.Statistics.DeepDungeon == DeepDungeon.PilgrimsTraverse)
                         this.Data.UI.DrawPotsherdRegenPotion(x + 4.0f, y + 4.0f, 1);
                 }
                 else
@@ -194,6 +194,8 @@ public sealed class StatisticsWindow : WindowEx, IDisposable
                 else if (this.Data.Statistics.DeepDungeon == DeepDungeon.HeavenOnHigh)
                     this.Data.UI.DrawPotsherdRegenPotion(x + offset, y + offset, 0);
                 else if (this.Data.Statistics.DeepDungeon == DeepDungeon.EurekaOrthos)
+                    this.Data.UI.DrawPotsherdRegenPotion(x + offset, y + offset, 2);
+                else if (this.Data.Statistics.DeepDungeon == DeepDungeon.PilgrimsTraverse)
                     this.Data.UI.DrawPotsherdRegenPotion(x + offset, y + offset, 2);
             }
             else
@@ -313,6 +315,28 @@ public sealed class StatisticsWindow : WindowEx, IDisposable
     }
 
     private void DrawTrapText(float x, float y, float iconSize, IEnumerable<StatisticsItem<Trap>>? data)
+    {
+        var offset = 0.0f;
+        foreach (var item in data ?? [])
+        {
+            var total = item.Total;
+            if (total > 1)
+                this.Data.UI.DrawTextAxis(x + offset + iconSize, y + offset + iconSize, total.ToString(CultureInfo.InvariantCulture), this.SummarySelectionColor(), Alignment.Right);
+            x += iconSize;
+        }
+    }
+    
+    private void DrawVotiveEffectIcon(float x, float y, float iconSize, IEnumerable<StatisticsItem<VotiveEffect>>? data)
+    {
+        var offset = 8.0f;
+        foreach (var item in data ?? [])
+        {
+            this.Data.UI.DrawVotiveEffect(x + offset, y + offset, (VotiveEffect)(Enum)item.Value);
+            x += iconSize;
+        }
+    }
+    
+    private void DrawVotiveEffectText(float x, float y, float iconSize, IEnumerable<StatisticsItem<VotiveEffect>>? data)
     {
         var offset = 0.0f;
         foreach (var item in data ?? [])
@@ -641,6 +665,7 @@ public sealed class StatisticsWindow : WindowEx, IDisposable
         this.DrawPomanderIcon(x, y3 + iconSize2, iconSize, statistics?.PomandersTotal);
         this.DrawEnchantmentIcon(x, y3 + iconSize3, iconSize, statistics?.EnchantmentsTotal, false);
         this.DrawTrapIcon(x + ((statistics?.EnchantmentsTotal?.Count() ?? 0) * iconSize), y3 + iconSize3, iconSize, statistics?.TrapsTotal);
+        this.DrawVotiveEffectIcon(x + ((statistics?.EnchantmentsTotal?.Count() ?? 0) + statistics?.TrapsTotal?.Count() ?? 0) * iconSize, y3 + iconSize3, iconSize, statistics?.VotiveEffectsTotal);
 
         this.DrawSummaryPageTexts(leftPanelAdjust, left, top);
         this.DrawLastFloorAndTotal(x2, x, y3, true, false);
@@ -652,6 +677,7 @@ public sealed class StatisticsWindow : WindowEx, IDisposable
         this.DrawPomanderText(x, y3 + iconSize2, iconSize, statistics?.PomandersTotal);
         this.DrawEnchantmentText(x, y3 + iconSize3, iconSize, statistics?.EnchantmentsTotal);
         this.DrawTrapText(x + ((statistics?.EnchantmentsTotal?.Count() ?? 0) * iconSize), y3 + iconSize3, iconSize, statistics?.TrapsTotal);
+        this.DrawVotiveEffectText(x + ((statistics?.EnchantmentsTotal?.Count() ?? 0) + (statistics?.TrapsTotal?.Count() ?? 0)) * iconSize, y3 + iconSize3, iconSize, statistics?.VotiveEffectsTotal);
 
         this.DrawGotUsedText(x, y3 + iconSize, iconSize, statistics?.CoffersTotal, statistics?.PomandersTotal);
     }
@@ -736,6 +762,11 @@ public sealed class StatisticsWindow : WindowEx, IDisposable
             this.DrawTrapIcon(x + ((statistics?.EnchantmentsByFloor?.ElementAtOrDefault(index)?.Count() ?? 0) * iconSize), y, iconSize, statistics?.TrapsByFloor?.ElementAtOrDefault(index));
         }, floors, left, x, y + iconSize3, iconSize, floorWidth, floorHeight);
         this.DrawTrapIcon(x + ((statistics?.EnchantmentsTotal?.Count() ?? 0) * iconSize) - leftPanelAdjust, y3 + iconSize3, iconSize, statistics?.TrapsTotal);
+        FloorLoop((floor, index, x, y) =>
+        {
+            this.DrawVotiveEffectIcon(x + (((statistics?.EnchantmentsByFloor?.ElementAtOrDefault(index)?.Count() ?? 0) + (statistics?.TrapsByFloor?.ElementAtOrDefault(index)?.Count() ?? 0)) * iconSize), y, iconSize, statistics?.VotiveEffectsByFloor?.ElementAtOrDefault(index));
+        }, floors, left, x, y + iconSize3, iconSize, floorWidth, floorHeight);
+        this.DrawVotiveEffectIcon(x + (((statistics?.EnchantmentsTotal?.Count() ?? 0) + (statistics?.TrapsTotal?.Count() ?? 0)) * iconSize) - leftPanelAdjust, y3 + iconSize3, iconSize, statistics?.VotiveEffectsTotal);
 
         TimeSpan timeBonusMissScoreTotal = TimeSpan.Zero;
         bool isTimeBonusMissScore = false;
@@ -775,6 +806,11 @@ public sealed class StatisticsWindow : WindowEx, IDisposable
             this.DrawTrapText(x + ((statistics?.EnchantmentsByFloor?.ElementAtOrDefault(index)?.Count() ?? 0) * iconSize), y, iconSize, statistics?.TrapsByFloor?.ElementAtOrDefault(index));
         }, floors, left, x, y + iconSize3, iconSize, floorWidth, floorHeight);
         this.DrawTrapText(x + ((statistics?.EnchantmentsTotal?.Count() ?? 0) * iconSize) - leftPanelAdjust, y3 + iconSize3, iconSize, statistics?.TrapsTotal);
+        FloorLoop((floor, index, x, y) =>
+        {
+            this.DrawVotiveEffectText(x + (((statistics?.EnchantmentsByFloor?.ElementAtOrDefault(index)?.Count() ?? 0) + (statistics?.TrapsByFloor?.ElementAtOrDefault(index)?.Count() ?? 0)) * iconSize), y, iconSize, statistics?.VotiveEffectsByFloor?.ElementAtOrDefault(index));
+        }, floors, left, x, y + iconSize3, iconSize, floorWidth, floorHeight);
+        this.DrawVotiveEffectText(x + (((statistics?.EnchantmentsTotal?.Count() ?? 0) + (statistics?.TrapsTotal?.Count() ?? 0)) * iconSize) - leftPanelAdjust, y3 + iconSize3, iconSize, statistics?.VotiveEffectsTotal);
         FloorLoop((floor, index, x, y) =>
         {
             this.DrawGotUsedText(x, y, iconSize, statistics?.CoffersByFloor?.ElementAtOrDefault(index), statistics?.PomandersByFloor?.ElementAtOrDefault(index), floor);

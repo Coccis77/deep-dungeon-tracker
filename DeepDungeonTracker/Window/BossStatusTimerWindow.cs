@@ -25,7 +25,7 @@ public sealed class BossStatusTimerWindow(string id, Configuration configuration
         var statistics = this.Data.Statistics;
         if (statistics.FloorSetStatistics != FloorSetStatistics.Summary)
         {
-            if (statistics.IsEurekaOrthosFloor99)
+            if (statistics.IsEurekaOrthosFloor99 || statistics.IsPilgrimsTraverseFloor99)
                 return "99";
             else
                 return statistics.FloorSetStatistics.GetDescription().Split('-').LastOrDefault() ?? string.Empty;

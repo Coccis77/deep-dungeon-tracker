@@ -8,5 +8,6 @@ public enum Trap
     Impeding,
     Toading,
     Odder,
-    Owlet
+    Owlet,
+    Fairy
 }

@@ -45,7 +45,7 @@ public unsafe class DataText
     private void LoadItems(Language language)
     {
         var sheet = Service.DataManager.GameData.Excel.GetSheet<Item>(language);
-        var indices = new uint[] { 15422, 23164, 38941 };
+        var indices = new uint[] { 15422, 23164, 38941, 46186 };
 
         for (var i = 0; i < indices.Length; i++)
         {
@@ -57,12 +57,14 @@ public unsafe class DataText
     private void LoadEnemies(Language language)
     {
         var sheet = Service.DataManager.Excel.GetSheet<BNpcName>(language);
-        var indices = new uint[] { 2566, 6880, 5041, 7610, 10309,
+        var indices = new uint[] { 2566, 6880, 5041, 7610, 10309, 14267,
             4986, 4999, 5012, 5025, 5038, 5309, 5321, 5333, 5345, 5356, 5371, 5384, 5397, 5410, 5424, 5438, 5449, 5461, 5471,
             7480, 7481, 7478, 7483, 7485, 7487, 7489, 7490, 7493,
             12240, 12261, 12242, 12263, 12265, 12267, 12246, 12247, 12102, 12100,
+            13979, 13973,13863, 13977, 14263, 14097, 13971, 13968, 14090, 14037,
             5046, 5047, 5048, 5049, 5050, 5051, 5052, 5053, 5283, 5284, 5285, 5286, 5287, 5288, 5289, 5290, 5291, 5292, 5293, 5294, 5295, 5296, 5297, 5298,
-            12322, 12323, 12324};
+            12322, 12323, 12324,
+        };
 
         for (var i = 0; i < indices.Length; i++)
         {
@@ -73,7 +75,7 @@ public unsafe class DataText
 
     public void LoadEnchantments()
     {
-        var indices = new uint[] { 7230, 7231, 7232, 7233, 7234, 7235, 7236, 7237, 7238, 7239, 7240, 9211, 9212, 10302 };
+        var indices = new uint[] { 7230, 7231, 7232, 7233, 7234, 7235, 7236, 7237, 7238, 7239, 7240, 9211, 9212, 10302, 11253 };
 
         for (var i = 0; i < indices.Length; i++)
         {
@@ -85,7 +87,7 @@ public unsafe class DataText
     private void LoadTraps(Language language)
     {
         var sheet = Service.DataManager.GameData.Excel.GetSheet<LogMessage>(language);
-        var indices = new uint[] { 7224, 7225, 7226, 7227, 7228, 9210, 10278 };
+        var indices = new uint[] { 7224, 7225, 7226, 7227, 7228, 9210, 10278, 11247 };
 
         for (var i = 0; i < indices.Length; i++)
         {
@@ -109,27 +111,29 @@ public unsafe class DataText
         return (false, null);
     }
 
-    public (bool, TextIndex?) IsPotsherd(uint index) => this.IsText(TextIndex.GelmorranPotsherd, TextIndex.OrthosAetherpoolFragment, null, index);
+    public (bool, TextIndex?) IsPotsherd(uint index) => this.IsText(TextIndex.GelmorranPotsherd, TextIndex.FragmentOfIllumedAetherpoolGlass, null, index);
 
     public (bool, TextIndex?) IsMimic(string name) => this.IsText(TextIndex.Mimic, TextIndex.QuiveringCoffer, name, null);
 
-    public (bool, TextIndex?) IsMandragora(string name) => this.IsText(TextIndex.Pygmaioi, TextIndex.OrthosKorrigan, name, null);
+    public (bool, TextIndex?) IsMandragora(string name) => this.IsText(TextIndex.Pygmaioi, TextIndex.TraverseKorrigan, name, null);
 
-    public (bool, TextIndex?) IsBoss(string name) => this.IsText(TextIndex.PalaceDeathgaze, TextIndex.Excalibur, name, null);
+    public (bool, TextIndex?) IsBoss(string name) => this.IsText(TextIndex.PalaceDeathgaze, TextIndex.EminentGrief, name, null);
 
     public (bool, TextIndex?) IsNPC(string name) => this.IsText(TextIndex.DuskwightLancer, TextIndex.NecroseKnight, name, null);
 
     public (bool, TextIndex?) IsDreadBeast(string name) => this.IsText(TextIndex.LamiaQueen, TextIndex.DemiCochma, name, null);
 
-    public (bool, TextIndex?) IsEnchantment(string name) => this.IsText(TextIndex.BlindnessEnchantment, TextIndex.DemiclonePenaltyEnchantment, name, null);
+    public (bool, TextIndex?) IsEnchantment(string name) => this.IsText(TextIndex.BlindnessEnchantment, TextIndex.IncensePenaltyEnchantment, name, null);
 
-    public (bool, TextIndex?) IsTrap(string name) => this.IsText(TextIndex.LandmineTrap, TextIndex.OwletTrap, name, null);
+    public (bool, TextIndex?) IsTrap(string name) => this.IsText(TextIndex.LandmineTrap, TextIndex.FairyTrap, name, null);
 
     public bool IsPalaceOfTheDeadRegion(uint territoryType, bool checkForSubRegion = false) => this.IsDeepDungeonRegion(territoryType, 56, 1793, checkForSubRegion, subAreaPlaceNameId: 129);
 
     public bool IsHeavenOnHighRegion(uint territoryType, bool checkForSubRegion = false) => this.IsDeepDungeonRegion(territoryType, 2409, 2775, checkForSubRegion, subAreaPlaceNameId: 2774);
 
     public bool IsEurekaOrthosRegion(uint territoryType, bool checkForSubRegion = false) => this.IsDeepDungeonRegion(territoryType, 67, 2529, checkForSubRegion, areaPlaceNameId: 942);
+    
+    public bool IsPilgrimsTraverseRegion(uint territoryType, bool checkForSubRegion = false) => this.IsDeepDungeonRegion(territoryType, 2956, 5277, checkForSubRegion, subAreaPlaceNameId: 3157);
 
     private bool IsDeepDungeonRegion(uint territoryType, uint regionIdPrimary, uint regionIdSecondary, bool checkForSubRegion, uint areaPlaceNameId = uint.MaxValue, uint subAreaPlaceNameId = uint.MaxValue)
     {

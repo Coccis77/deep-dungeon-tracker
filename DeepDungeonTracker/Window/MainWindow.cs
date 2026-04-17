@@ -385,7 +385,7 @@ public sealed class MainWindow : WindowEx, IDisposable
         ui.Scale = config.Scale;
 
         var width = 440.0f;
-        var height = 800.0f;
+        var height = 1000.0f;
 
         ui.DrawBackground(width, height, (!config.SolidBackground && this.IsFocused) || config.SolidBackground);
         ui.DrawDivisorHorizontal(14.0f, 34.0f, width - 26.0f);

@@ -160,7 +160,13 @@ public sealed class TrackerWindow(string id, Configuration configuration, Data d
             }
 
             if (this.Data.Common.FloorEffect.ShowPomanderOfAlteration)
+            {
                 ui.DrawCoffer(x, y, Coffer.PomanderOfAlteration);
+                x += spaceX;
+            }
+            
+            if (this.Data.Common.FloorEffect.ShowPomanderOfDevotion)
+                ui.DrawCoffer(x, y, Coffer.PomanderOfDevotion);
 
             ui.Scale /= floorEffectPomandersScale;
         }

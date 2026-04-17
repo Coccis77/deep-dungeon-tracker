@@ -10,5 +10,7 @@ public enum DeepDungeon
     [Description("Heaven-on-High")]
     HeavenOnHigh,
     [Description("Eureka Orthos")]
-    EurekaOrthos
+    EurekaOrthos,
+    [Description("Pilgrim's Traverse")]
+    PilgrimsTraverse
 }

@@ -44,7 +44,8 @@ public sealed class Data : IDisposable
     public bool IsInDeepDungeonSubArea =>
         this.Text.IsPalaceOfTheDeadRegion(Service.ClientState.TerritoryType, true) ||
         this.Text.IsHeavenOnHighRegion(Service.ClientState.TerritoryType, true) ||
-        this.Text.IsEurekaOrthosRegion(Service.ClientState.TerritoryType, true);
+        this.Text.IsEurekaOrthosRegion(Service.ClientState.TerritoryType, true) ||
+        this.Text.IsPilgrimsTraverseRegion(Service.ClientState.TerritoryType, true);
 
     public Data(IUiBuilder uiBuilder, Configuration configuration)
     {
@@ -64,6 +65,7 @@ public sealed class Data : IDisposable
         RegenPotionConsumedEvents.Changed += this.RegenPotionConsumedAction;
         TransferenceInitiatedEvents.Changed += this.TransferenceInitiatedAction;
         DutyFailedEvents.Changed += this.DutyFailedAction;
+        VotiveCandelabraActivatedEvents.Changed += this.VotiveCandelabraActivatedAction;
 
         if (Service.ClientState.IsLoggedIn)
         {
@@ -93,6 +95,7 @@ public sealed class Data : IDisposable
         RegenPotionConsumedEvents.Changed -= this.RegenPotionConsumedAction;
         TransferenceInitiatedEvents.Changed -= this.TransferenceInitiatedAction;
         DutyFailedEvents.Changed -= this.DutyFailedAction;
+        VotiveCandelabraActivatedEvents.Changed -= this.VotiveCandelabraActivatedAction;
         this.Common.Dispose();
         this.UI.Dispose();
     }
@@ -269,11 +272,14 @@ public sealed class Data : IDisposable
                 {
                     var itemId = e.Item.ItemId;
 
-                    var potsherdItemIds = new uint[] { 15422, 23164, 38941 };
-                    if (potsherdItemIds.Contains(itemId))
+                    var potsherdItemIds = new uint[] { 15422, 23164, 38941, 46186 };
+                    if (potsherdItemIds.Contains(itemId)) {
                         this.Common.BronzeChestOpened(Coffer.Potsherd);
-                    else
-                        this.Common.BronzeChestOpened(Coffer.Medicine);
+                        break;
+                    }
+                    
+                    this.Common.BronzeChestOpened(Coffer.Medicine);
+                    break;
                 }
             }
         }
@@ -307,11 +313,11 @@ public sealed class Data : IDisposable
     {
         if (args.Type == StoneChangedType.StoneObtained)
         {
-            this.Common.StoneObtained(args.ItemId);
+            this.Common.StoneObtained(args.ItemId, args.StoneType);
         }
         else if (args.Type == StoneChangedType.StoneUsed)
         {
-            this.Common.StoneUsed(args.ItemId);
+            this.Common.StoneUsed(args.ItemId, args.StoneType); 
         }
     }
 
@@ -343,5 +349,10 @@ public sealed class Data : IDisposable
     private void DutyFailedAction(object? sender, DutyFailedEventArgs args)
     {
         this.Common.DutyFailed();
+    }
+    
+    private void VotiveCandelabraActivatedAction(object? sender, VotiveCandelabraActivatedEventArgs args)
+    {
+        this.Common.VotiveCandelabraActivated(args.ItemId);
     }
 }

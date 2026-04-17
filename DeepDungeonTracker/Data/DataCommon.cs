@@ -66,8 +66,11 @@ public sealed unsafe class DataCommon : IDisposable
 
     private bool IsEurekaOrthosFloor99 => this.DeepDungeon == DeepDungeon.EurekaOrthos &&
                                           this.CurrentSaveSlot?.CurrentFloorNumber() == 99;
+    
+    private bool IsPilgrimsTraverseFloor99 => this.DeepDungeon == DeepDungeon.PilgrimsTraverse &&
+                                          this.CurrentSaveSlot?.CurrentFloorNumber() == 99;
 
-    public bool IsSpecialBossFloor => this.IsEurekaOrthosFloor99;
+    public bool IsSpecialBossFloor => this.IsEurekaOrthosFloor99 || this.IsPilgrimsTraverseFloor99;
 
     public bool IsBossFloor => this.IsLastFloor || this.IsSpecialBossFloor;
     
@@ -479,9 +482,12 @@ public sealed unsafe class DataCommon : IDisposable
             this.DeepDungeon = DeepDungeon.HeavenOnHigh;
         }
         else if (dataText?.IsEurekaOrthosRegion(territoryType) ?? false)
-
         {
             this.DeepDungeon = DeepDungeon.EurekaOrthos;
+        }
+        else if (dataText?.IsPilgrimsTraverseRegion(territoryType) ?? false)
+        {
+            this.DeepDungeon = DeepDungeon.PilgrimsTraverse;
         }
         else
             this.DeepDungeon = DeepDungeon.None;
@@ -528,6 +534,13 @@ public sealed unsafe class DataCommon : IDisposable
             else if (floorNumber >= 31 && floorNumber <= 98)
                 return TimeSpan.FromMinutes(10);
         }
+        else if (this.DeepDungeon == DeepDungeon.PilgrimsTraverse)
+        {
+            if (floorNumber >= 1 && floorNumber <= 29)
+                return TimeSpan.FromMinutes(1);
+            else if (floorNumber >= 31 && floorNumber <= 98)
+                return TimeSpan.FromMinutes(10);
+        }
 
         return default;
     }
@@ -548,6 +561,11 @@ public sealed unsafe class DataCommon : IDisposable
         var result = dataText?.IsTrap(message) ?? new();
         if (result.Item1)
             this.CurrentSaveSlot?.CurrentFloor()?.TrapTriggered((Trap)(result.Item2! - TextIndex.LandmineTrap));
+    }
+
+    public void VotiveCandelabraActivated(int itemId)
+    {
+        this.FloorEffect.NextFloorVotiveEffect = (VotiveEffect)(itemId - 1);
     }
 
     public void CheckForEnemyKilled(DataText dataText, string name, uint id)
@@ -688,12 +706,14 @@ public sealed unsafe class DataCommon : IDisposable
             this.CurrentSaveSlot?.CurrentFloor()?.TimeUpdate(time);
             this.FloorScoreUpdate();
             this.CurrentSaveSlot?.AddFloor();
+            this.CurrentSaveSlot?.CurrentFloor()?.VotiveEffectActivated(this.FloorEffect.NextFloorVotiveEffect);
 
             var floorEffect = new FloorEffect
             {
                 ShowPomanderOfAffluence = this.FloorEffect.IsPomanderOfAffluenceUsed,
                 ShowPomanderOfFlight = this.FloorEffect.IsPomanderOfFlightUsed,
-                ShowPomanderOfAlteration = this.FloorEffect.IsPomanderOfAlterationUsed
+                ShowPomanderOfAlteration = this.FloorEffect.IsPomanderOfAlterationUsed,
+                ShowPomanderOfDevotion = this.FloorEffect.IsPomanderOfDevotionUsed
             };
             this.FloorEffect = floorEffect;
         }
@@ -701,7 +721,7 @@ public sealed unsafe class DataCommon : IDisposable
 
     private void SpecificFloors()
     {
-        if (this.IsEurekaOrthosFloor99)
+        if (this.IsSpecialBossFloor)
         {
             var floor = this.CurrentSaveSlot?.CurrentFloor();
             if (floor?.Kills == 0)
@@ -711,7 +731,7 @@ public sealed unsafe class DataCommon : IDisposable
         }
     }
 
-    public bool CheckForValidContent(int contentId) => contentId is >= 60001 and <= 60040;
+    public bool CheckForValidContent(int contentId) => contentId is >= 60001 and <= 60050;
 
     public void DutyStarted(DataText dataText) => this.StartFirstFloor((int)EventFramework.Instance()->GetContentDirector()->ContentId, dataText);
 
@@ -740,18 +760,30 @@ public sealed unsafe class DataCommon : IDisposable
 
     public void PomanderObtained(int itemId)
     {
+        itemId--;
         Coffer pomander = default;
         if (this.DeepDungeon == DeepDungeon.PalaceOfTheDead || this.DeepDungeon == DeepDungeon.HeavenOnHigh)
         {
-            pomander = (Coffer)(itemId - 1);
+            pomander = (Coffer)(itemId);
         }
         else if (this.DeepDungeon == DeepDungeon.EurekaOrthos)
         {
             var totalProtomanders = (int)(Pomander.Dread + 1);
-            var index = itemId - totalProtomanders - 1;
+            var index = itemId - totalProtomanders;
             pomander = index >= 0
-                ? (Coffer)DataCommon.SharedPomanders[itemId - totalProtomanders - 1]
-                : (Coffer)itemId - 1;
+                ? (Coffer)DataCommon.SharedPomanders[itemId - totalProtomanders]
+                : (Coffer)itemId;
+        }
+        if (this.DeepDungeon == DeepDungeon.PilgrimsTraverse)
+        {
+            if (itemId >= 35)
+            {
+                pomander = (Coffer)(itemId - 13);
+            }
+            else
+            {
+                pomander = (Coffer)(itemId);
+            }
         }
 
         this.CurrentSaveSlot?.CurrentFloor()?.CofferOpened(pomander);
@@ -763,7 +795,7 @@ public sealed unsafe class DataCommon : IDisposable
             this.CurrentSaveSlot?.CurrentFloor()?.CofferOpened(Coffer.Aetherpool);
     }
 
-    public void StoneObtained(int itemId)
+    public void StoneObtained(int itemId, uint stoneType)
     {
         if (this.DeepDungeon == DeepDungeon.HeavenOnHigh)
         {
@@ -773,6 +805,16 @@ public sealed unsafe class DataCommon : IDisposable
         {
             DemicloneObtained(itemId);
         }
+        else if (this.DeepDungeon == DeepDungeon.PilgrimsTraverse)
+        {
+            if (stoneType == 9206) // poisonfruit
+            {
+                IncenseObtained(itemId - 2);
+            } else if (stoneType == 10285)
+            {
+                IncenseObtained(itemId - 3);
+            }
+        }
     }
 
     public void MagiciteObtained(int itemId) =>
@@ -780,6 +822,9 @@ public sealed unsafe class DataCommon : IDisposable
 
     public void DemicloneObtained(int itemId) =>
         this.CurrentSaveSlot?.CurrentFloor()?.CofferOpened(itemId - 1 + Coffer.UneiDemiclone);
+    
+    public void IncenseObtained(int itemId) =>
+        this.CurrentSaveSlot?.CurrentFloor()?.CofferOpened(itemId - 1 + Coffer.MazeRootIncense);
 
     public void PomanderUsed(int itemId)
     {
@@ -792,6 +837,13 @@ public sealed unsafe class DataCommon : IDisposable
             var index = itemId - totalProtomanders;
             pomander = index >= 0 ? DataCommon.SharedPomanders[itemId - totalProtomanders] : (Pomander)itemId;
         }
+        if (this.DeepDungeon == DeepDungeon.PilgrimsTraverse)
+        {
+            if (itemId >= 35)
+            {
+                pomander = (Pomander)(itemId - 13);
+            }
+        }
 
         if (pomander == Pomander.Safety)
             this.FloorEffect.ShowPomanderOfSafety = true;
@@ -801,11 +853,13 @@ public sealed unsafe class DataCommon : IDisposable
             this.FloorEffect.IsPomanderOfFlightUsed = true;
         else if (pomander == Pomander.Alteration)
             this.FloorEffect.IsPomanderOfAlterationUsed = true;
+        else if (pomander == Pomander.Devotion)
+            this.FloorEffect.IsPomanderOfDevotionUsed = true;
 
         this.CurrentSaveSlot?.CurrentFloor()?.PomanderUsed(pomander);
     }
 
-    public void StoneUsed(int itemId)
+    public void StoneUsed(int itemId, uint stoneType)
     {
         if (this.DeepDungeon == DeepDungeon.HeavenOnHigh)
         {
@@ -814,6 +868,16 @@ public sealed unsafe class DataCommon : IDisposable
         else if (this.DeepDungeon == DeepDungeon.EurekaOrthos)
         {
             this.DemicloneUsed(itemId);
+        }
+        else if (this.DeepDungeon == DeepDungeon.PilgrimsTraverse)
+        {
+            if (stoneType == 11250) // poisonfruit
+            {
+                IncenseUsed(itemId - 2);
+            } else if (stoneType == 11251)
+            {
+                IncenseUsed(itemId - 3);
+            }
         }
     }
 
@@ -824,6 +888,8 @@ public sealed unsafe class DataCommon : IDisposable
     }
 
     public void DemicloneUsed(int itemId) => this.SpecialPomanderUsed(Coffer.UneiDemiclone, itemId);
+    
+    public void IncenseUsed(int itemId) => this.SpecialPomanderUsed(Coffer.MazeRootIncense, itemId);
 
     private void SpecialPomanderUsed(Coffer baseSpecialPomander, int itemId)
     {

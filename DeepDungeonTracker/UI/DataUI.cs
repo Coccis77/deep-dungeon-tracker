@@ -47,7 +47,7 @@ public sealed class DataUI(IUiBuilder uiBuilder) : IDisposable
 
     public void DrawCheckMark(float x, float y, bool checkMark) => this.Render.DrawUIElement(this.ResourceUI.UI, x, y, 0.5f, Convert.ToInt32(checkMark), 2, 1, new(346.0f, 33.0f), new(108.0f, 54.0f), null, Alignment.Center);
 
-    public void DrawDeepDungeon(float x, float y, DeepDungeon deepDungeon, Alignment align = Alignment.Left) => this.Render.DrawUIElement(this.ResourceUI.DeepDungeon, x, y, 0.75f, (int)deepDungeon - 1, 1, 3, align: align);
+    public void DrawDeepDungeon(float x, float y, DeepDungeon deepDungeon, Alignment align = Alignment.Left) => this.Render.DrawUIElement(this.ResourceUI.DeepDungeon, x, y, 0.75f, (int)deepDungeon - 1, 1, 4, align: align);
 
     public void DrawJob(float x, float y, uint jobId, float innerScale = 0.75f) => this.Render.DrawUIElement(this.ResourceUI.Job, x, y, innerScale, (int)jobId, 4, 6, align: Alignment.Center);
 
@@ -58,6 +58,8 @@ public sealed class DataUI(IUiBuilder uiBuilder) : IDisposable
     public void DrawEnchantment(float x, float y, Enchantment enchantment, bool isEnchantmentSerenized) => this.Render.DrawUIElement(this.ResourceUI.Enchantment, x, y, 0.5f, (int)enchantment, 4, 4, null, null, !isEnchantmentSerenized ? Color.White : new(1.0f, 1.0f, 1.0f, 0.25f));
 
     public void DrawTrap(float x, float y, Trap trap) => this.Render.DrawUIElement(this.ResourceUI.Trap, x, y, 0.5f, (int)trap, 3, 3, null, null, Color.Red);
+
+    public void DrawVotiveEffect(float x, float y, VotiveEffect votiveEffect) => this.Render.DrawUIElement(this.ResourceUI.VotiveEffect, x, y, 0.7f, (int)votiveEffect, 4, 3);
 
     public void DrawBossStatusTimer(float x, float y, BossStatusTimer bossStatusTimer, byte stacks = 0) => this.Render.DrawUIElement(this.ResourceUI.BossStatusTimer, x, y, 0.5f, (int)(stacks == 0 ? bossStatusTimer : BossStatusTimer.VulnerabilityUp + stacks - 1), 5, 4);
 

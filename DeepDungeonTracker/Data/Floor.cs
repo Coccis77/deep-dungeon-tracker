@@ -69,6 +69,9 @@ public class Floor(int number)
     [JsonInclude]
     [JsonPropertyName("Pomanders")]
     public Collection<Pomander>? SerializationPomanders { get => this.Pomanders?.Count > 0 ? this.Pomanders : null; private set => this.Pomanders = value ?? []; }
+    
+    [JsonInclude]
+    public VotiveEffect? VotiveEffect { get; private set; }
 
     [JsonInclude]
     public int Deaths { get; private set; }
@@ -110,10 +113,12 @@ public class Floor(int number)
 
     public void TrapTriggered(Trap trap) => this.Traps.Add(trap);
 
+    public void VotiveEffectActivated(VotiveEffect? votiveEffect) => this.VotiveEffect = votiveEffect;
+
     public void PomanderUsed(Pomander pomander)
     {
         this.Pomanders.Add(pomander);
-        if (pomander == Pomander.Serenity)
+        if (pomander is Pomander.Serenity or Pomander.MazeRootIncense)
         {
             if (this.Enchantments.Count > 0)
             {

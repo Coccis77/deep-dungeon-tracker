@@ -15,5 +15,6 @@ public enum Enchantment
     Gloom,
     Sprint,
     MagicitePenalty,
-    DemiclonePenalty
+    DemiclonePenalty,
+    IncensePenalty,
 }

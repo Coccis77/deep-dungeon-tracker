@@ -45,6 +45,8 @@ public class DataStatistics
 
     public IImmutableList<IEnumerable<StatisticsItem<Trap>>>? TrapsByFloor { get; private set; }
 
+    public IImmutableList<IEnumerable<StatisticsItem<VotiveEffect>>>? VotiveEffectsByFloor { get; private set; }
+
     public IImmutableList<IEnumerable<StatisticsItem<Pomander>>>? PomandersByFloor { get; private set; }
 
     public IEnumerable<StatisticsItem<Miscellaneous>>? MiscellaneousLastFloor { get; private set; }
@@ -58,6 +60,8 @@ public class DataStatistics
     public IEnumerable<StatisticsItem<Enchantment>>? EnchantmentsTotal { get; private set; }
 
     public IEnumerable<StatisticsItem<Trap>>? TrapsTotal { get; private set; }
+
+    public IEnumerable<StatisticsItem<VotiveEffect>>? VotiveEffectsTotal { get; private set; }
 
     public IEnumerable<StatisticsItem<Pomander>>? PomandersLastFloor { get; private set; }
 
@@ -80,6 +84,8 @@ public class DataStatistics
     public uint ClassJobId => this.SaveSlot?.ClassJobId ?? 0;
 
     public bool IsEurekaOrthosFloor99 => this.DeepDungeon == DeepDungeon.EurekaOrthos && this.FloorSetStatistics == FloorSetStatistics.From091To100;
+    
+    public bool IsPilgrimsTraverseFloor99 => this.DeepDungeon == DeepDungeon.PilgrimsTraverse && this.FloorSetStatistics == FloorSetStatistics.From091To100;
 
     private static IEnumerable<Pomander> BossRelevantPomanders { get; }
 
@@ -89,7 +95,8 @@ public class DataStatistics
         [
             Pomander.Resolution,
             Pomander.InfernoMagicite, Pomander.CragMagicite, Pomander.VortexMagicite, Pomander.ElderMagicite,
-            Pomander.UneiDemiclone, Pomander.DogaDemiclone, Pomander.OnionKnightDemiclone
+            Pomander.UneiDemiclone, Pomander.DogaDemiclone, Pomander.OnionKnightDemiclone,
+            Pomander.MazeRootIncense, Pomander.BarkBalmIncense, Pomander.PoisonfruitIncense
         ];
     }
 
@@ -190,6 +197,7 @@ public class DataStatistics
         this.CoffersByFloor = ImmutableArray<IEnumerable<StatisticsItem<Coffer>>>.Empty;
         this.EnchantmentsByFloor = ImmutableArray<IEnumerable<StatisticsItem<Enchantment>>>.Empty;
         this.TrapsByFloor = ImmutableArray<IEnumerable<StatisticsItem<Trap>>>.Empty;
+        this.VotiveEffectsByFloor = ImmutableArray<IEnumerable<StatisticsItem<VotiveEffect>>>.Empty;
         this.PomandersByFloor = ImmutableArray<IEnumerable<StatisticsItem<Pomander>>>.Empty;
         this.BossStatusTimerByFloorSet = [];
         this.PomandersBossStatusTimer = [];
@@ -203,6 +211,17 @@ public class DataStatistics
             this.CoffersByFloor = this.CoffersByFloor.AddRange(this.FloorSet?.Floors.Select(x => x.Coffers.GroupBy(x => x).Select(x => new StatisticsItem<Coffer>(x.Key, x.Count())).Take(9)) ?? []);
             this.EnchantmentsByFloor = this.EnchantmentsByFloor.AddRange(this.FloorSet?.Floors.Select(x => x.AdjustedEnchantments().GroupBy(x => x).Select(x => new StatisticsItem<Enchantment>(x.Key, x.Count())).Take(3)) ?? []);
             this.TrapsByFloor = this.TrapsByFloor.AddRange(this.FloorSet?.Floors.Select(x => x.Traps.GroupBy(x => x).Select(x => new StatisticsItem<Trap>(x.Key, x.Count())).Take(6)) ?? []);
+            this.VotiveEffectsByFloor = this.VotiveEffectsByFloor.AddRange(
+                this.FloorSet?.Floors
+                    .Select(floor =>
+                    {
+                        var ve = floor.VotiveEffect;
+                        if (ve is null)
+                            return Enumerable.Empty<StatisticsItem<VotiveEffect>>();
+                        return [new StatisticsItem<VotiveEffect>(ve!.Value, 1)];
+                    })
+                ?? []
+            );
             this.PomandersByFloor = this.PomandersByFloor.AddRange(this.FloorSet?.Floors.Select(x => x.Pomanders.GroupBy(x => x).Select(x => new StatisticsItem<Pomander>(x.Key, x.Count())).Take(9)) ?? []);
 
             this.MiscellaneousLastFloor = (this.MiscellaneousByFloor?.Count == 10) ? this.MiscellaneousByFloor[^1] : default;
@@ -212,6 +231,13 @@ public class DataStatistics
             this.CoffersTotal = this.FloorSet?.Floors.SelectMany(x => x.Coffers).GroupBy(x => x).Select(x => new StatisticsItem<Coffer>(x.Key, x.Count())).OrderByDescending(x => x.Value != Coffer.Potsherd && x.Value != Coffer.Medicine && x.Value != Coffer.Aetherpool).ThenBy(x => x.Value).Take(22);
             this.EnchantmentsTotal = this.FloorSet?.Floors.SelectMany(x => x.Enchantments).GroupBy(x => x).Select(x => new StatisticsItem<Enchantment>(x.Key, x.Count()));
             this.TrapsTotal = this.FloorSet?.Floors.SelectMany(x => x.Traps).GroupBy(x => x).Select(x => new StatisticsItem<Trap>(x.Key, x.Count()));
+            this.VotiveEffectsTotal = this.VotiveEffectsTotal = this.FloorSet?.Floors
+                .Select(x => x.VotiveEffect)
+                .Where(x => x != null)
+                .GroupBy(x => x!)
+                .Select(x => new StatisticsItem<VotiveEffect>(x.Key!.Value, x.Count()))
+                .Take(10)
+                .ToList();
 
             this.PomandersLastFloor = this.FloorSet?.LastFloor()?.Pomanders.GroupBy(x => x).Select(x => new StatisticsItem<Pomander>(x.Key, x.Count())).Take(9);
             this.PomandersTotal = this.FloorSet?.Floors.SelectMany(x => x.Pomanders).GroupBy(x => x).Select(x => new StatisticsItem<Pomander>(x.Key, x.Count())).OrderBy(x => x.Value).Take(22);
@@ -223,7 +249,7 @@ public class DataStatistics
 
             this.Inventory = DataStatistics.BuildInventory(coffersTotalExceptLast, pomandersTotalExceptLast);
 
-            if (this.IsEurekaOrthosFloor99)
+            if (this.IsEurekaOrthosFloor99 || this.IsPilgrimsTraverseFloor99)
                 this.PomandersBossStatusTimer = this.FloorSet?.Floors.Where(x => x.Number == 99).SelectMany(x => x.Pomanders).GroupBy(x => x).Select(x => new StatisticsItem<Pomander>(x.Key, x.Count())).Where(x => DataStatistics.BossRelevantPomanders.Contains(x.Value)).Take(4);
             else
                 this.PomandersBossStatusTimer = this.FloorSet?.LastFloor()?.Pomanders.GroupBy(x => x).Select(x => new StatisticsItem<Pomander>(x.Key, x.Count()))?.Where(x => DataStatistics.BossRelevantPomanders.Contains(x.Value)).Take(4);
@@ -249,6 +275,13 @@ public class DataStatistics
             this.CoffersTotal = floors?.SelectMany(x => x.Coffers).GroupBy(x => x).Select(x => new StatisticsItem<Coffer>(x.Key, x.Count())).OrderByDescending(x => x.Value != Coffer.Potsherd && x.Value != Coffer.Medicine && x.Value != Coffer.Aetherpool).ThenBy(x => x.Value).Take(22);
             this.EnchantmentsTotal = floors?.SelectMany(x => x.Enchantments).GroupBy(x => x).Select(x => new StatisticsItem<Enchantment>(x.Key, x.Count()));
             this.TrapsTotal = floors?.SelectMany(x => x.Traps).GroupBy(x => x).Select(x => new StatisticsItem<Trap>(x.Key, x.Count()));
+            this.VotiveEffectsTotal = floors?
+                .Select(x => x.VotiveEffect)
+                .Where(x => x != null)
+                .GroupBy(x => x!)
+                .Select(x => new StatisticsItem<VotiveEffect>(x.Key!.Value, x.Count()))
+                .Take(10)
+                .ToList();
 
             this.PomandersLastFloor = lastFloors?.SelectMany(x => x.Pomanders).GroupBy(x => x).Select(x => new StatisticsItem<Pomander>(x.Key, x.Count())).Take(9);
             this.PomandersTotal = floors?.SelectMany(x => x.Pomanders).GroupBy(x => x).Select(x => new StatisticsItem<Pomander>(x.Key, x.Count())).OrderBy(x => x.Value).Take(22);

@@ -124,7 +124,7 @@ public class SaveSlot(DeepDungeon deepDungeon = DeepDungeon.None, int contentId 
         this.AetherpoolArmor = Math.Max(this.AetherpoolArmor, armor);
     }
 
-    public bool IsSpecialBossFloor(Floor? floor) => (this.DeepDungeon == DeepDungeon.EurekaOrthos && floor?.Number == 99);
+    public bool IsSpecialBossFloor(Floor? floor) => ((this.DeepDungeon == DeepDungeon.EurekaOrthos || this.DeepDungeon == DeepDungeon.PilgrimsTraverse) && floor?.Number == 99);
 
     public void AdditionalKills(int flootSetIndex, int kills)
     {

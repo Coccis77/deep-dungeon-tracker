@@ -24,6 +24,9 @@ public enum Coffer
     ProtomanderOfLethargy,
     ProtomanderOfStorms,
     ProtomanderOfDread,
+    PomanderOfHaste,
+    PomanderOfPurification,
+    PomanderOfDevotion,
     Potsherd = 50,
     Medicine,
     Aetherpool,
@@ -33,5 +36,8 @@ public enum Coffer
     ElderMagicite,
     UneiDemiclone,
     DogaDemiclone,
-    OnionKnightDemiclone
+    OnionKnightDemiclone,
+    MazeRootIncense,
+    BarkBalmIncense,
+    PoisonfruitIncense,
 }

@@ -10,6 +10,8 @@ public static class ScoreCreator
             return new ScoreHeavenOnHigh(saveSlot, isDutyComplete);
         else if (saveSlot?.DeepDungeon == DeepDungeon.EurekaOrthos)
             return new ScoreEurekaOrthos(saveSlot, isDutyComplete);
+        else if (saveSlot?.DeepDungeon == DeepDungeon.PilgrimsTraverse)
+            return new ScorePilgrimsTraverse(saveSlot, isDutyComplete);
         return null;
     }
 }
