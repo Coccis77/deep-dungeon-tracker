@@ -15,6 +15,35 @@ Type `/ddtscore` to toggle the Score Window visibility.
 
 Type `/ddtload` to load the last saved slot and open the Statistics Window.
 
+## How to install
+
+### Install .NET 10.0
+Go to the official microsoft website, and install .NET 10.0
+
+https://dotnet.microsoft.com/fr-fr/download/dotnet/10.0
+
+### Build the project
+Open a terminal (Powershell on Windows for example)
+
+Navigate to the project and use the following command:
+```
+dotnet build
+```
+
+It should generate a new file in the project:
+```
+DeepDungeonTracker\bin\x64\Debug\DeepDungeonTracker.dll
+```
+
+### Add the plugin in Dalamud
+
+- Go to the Dalamud settings, open the tab "Experimental"
+- In the development plugin section, add the full path to the file generated, for example `C:\Users\Coccis\Documents\deep-dungeon-tracker\DeepDungeonTracker\bin\x64\Debug\DeepDungeonTracker.dll`
+- Check the `Enabled` checkbox
+- Click on the save button in the bottom right
+- In the list of Dalamud plugins, you should have a new `Developer tools` section, with the DDT plugin compatible with PT.
+- Disable the official DDT if you only play PT. Switch if you want to go into the old DDs.
+
 ## Features
 - Keep track of the number of kills, coffers opened, regeneration potions consumed, potsherds obtained, total time and more.
 - Examine the collected data.
