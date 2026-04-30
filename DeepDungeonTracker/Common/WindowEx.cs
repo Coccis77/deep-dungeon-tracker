@@ -26,7 +26,7 @@ public abstract class WindowEx : Window
 
     public static string GetWindowId(string id, string className) => $"{className?.Replace("Window", string.Empty, StringComparison.InvariantCultureIgnoreCase)}##{id}";
 
-    public static void DisposeWindows(IReadOnlyList<Window> windows)
+    public static void DisposeWindows(IReadOnlyList<IWindow> windows)
     {
         if (windows == null)
             return;
