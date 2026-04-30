@@ -14,7 +14,7 @@ namespace DeepDungeonTracker.Hook
 
         public PacketActorControlHook()
         {
-            _packetActorControlHookDelegate = Service.GameInteropProvider.HookFromAddress<ProcessPacketActorControlDelegate>(Service.SigScanner.ScanText("E8 ?? ?? ?? ?? 0F B7 0B 83 E9 64"), ProcessPacketActorControlDetour);
+            _packetActorControlHookDelegate = Service.GameInteropProvider.HookFromAddress<ProcessPacketActorControlDelegate>(Service.SigScanner.ScanText("E8 ?? ?? ?? ?? 0F B7 0B 83 E9"), ProcessPacketActorControlDetour);
             _packetActorControlHookDelegate.Enable();
         }
 

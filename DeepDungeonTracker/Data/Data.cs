@@ -200,7 +200,7 @@ public sealed class Data : IDisposable
 
     public void Login() => this.Common.ResetCharacterData();
 
-    public void TerritoryChanged(ushort territoryType) => this.Common.DeepDungeonUpdate(this.Text, territoryType);
+    public void TerritoryChanged(uint territoryType) => this.Common.DeepDungeonUpdate(this.Text, territoryType);
 
     public void ConditionChange(ConditionFlag flag, bool value)
     {
@@ -235,7 +235,7 @@ public sealed class Data : IDisposable
         }
     }
 
-    public void DutyStarted(ushort dutyId)
+    public void DutyStarted(uint dutyId)
     {
         if (this.InDeepDungeon.IsActivated)
         {

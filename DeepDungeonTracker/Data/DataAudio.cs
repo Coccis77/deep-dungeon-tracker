@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace DeepDungeonTracker;
 
-public class DataAudio
+public unsafe class DataAudio
 {
     public void PlaySound(SoundIndex id) => UIGlobals.PlaySoundEffect(Convert.ToUInt32(id, CultureInfo.InvariantCulture));
 }

@@ -467,7 +467,7 @@ public sealed unsafe class DataCommon : IDisposable
         }
     }
 
-    public void DeepDungeonUpdate(DataText dataText, ushort territoryType)
+    public void DeepDungeonUpdate(DataText dataText, uint territoryType)
     {
         var deepDungeon = this.DeepDungeon;
         if (dataText?.IsPalaceOfTheDeadRegion(territoryType) ?? false)
@@ -599,7 +599,7 @@ public sealed unsafe class DataCommon : IDisposable
             if (!this.IsBossFloor)
                 this.CheckForEnemyKilled(dataText, name, entityId);
         }
-        else if (character?.ObjectKind == ObjectKind.Player)
+        else if (character?.ObjectKind == ObjectKind.Pc)
             this.CheckForPlayerKilled(character);
     }
 

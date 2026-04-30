@@ -9,6 +9,8 @@ using DeepDungeonTracker.Hook;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Dalamud.Game.Chat;
+using Dalamud.Game.DutyState;
 
 namespace DeepDungeonTracker;
 
@@ -173,15 +175,15 @@ public sealed class Plugin : IDalamudPlugin
 
     private void Login() => this.Data.Login();
 
-    private void TerritoryChanged(ushort territoryType) => this.Data.TerritoryChanged(territoryType);
+    private void TerritoryChanged(uint territoryType) => this.Data.TerritoryChanged(territoryType);
 
     private void ConditionChange(ConditionFlag flag, bool value) => this.Data.ConditionChange(flag, value);
 
-    private void ChatMessage(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled) => this.Data.ChatMessage(message.TextValue);
+    private void ChatMessage(IHandleableChatMessage message) => this.Data.ChatMessage(message.Message.TextValue);
 
-    private void DutyStarted(object? sender, ushort e) => this.Data.DutyStarted(e);
+    private void DutyStarted(IDutyStateEventArgs args) => this.Data.DutyStarted(args.TerritoryType.RowId);
 
-    private void DutyCompleted(object? sender, ushort e) => this.Data.DutyCompleted();
+    private void DutyCompleted(IDutyStateEventArgs args) => this.Data.DutyCompleted();
 
     private void InventoryChangedRaw(IReadOnlyCollection<InventoryEventArgs> events) => this.Data.InventoryChangedRaw(events);
 
